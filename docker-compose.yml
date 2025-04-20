@@ -1,0 +1,98 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - libnet
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  db:
+    restart: on-failure
+    image: postgres
+    environment:
+      POSTGRES_USER: libraryuser
+      POSTGRES_PASSWORD: librarypass
+      POSTGRES_DB: librarydb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - libnet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: on-failure
+    environment:
+      RABBITMQ_DEFAULT_USER: libraryuser
+      RABBITMQ_DEFAULT_PASS: librarypass
+    ports:
+      - "5672:5672"    # AMQP protocol
+      - "15672:15672"  # Management UI
+    networks:
+      - libnet
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend:
+    restart: on-failure
+    build: ./backend
+    depends_on:
+      - db
+      - rabbitmq
+      - redis
+    environment:
+      POSTGRES_USER: libraryuser
+      POSTGRES_PASSWORD: librarypass
+      POSTGRES_DB: librarydb
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_DEFAULT_USER: libraryuser
+      RABBITMQ_DEFAULT_PASS: librarypass
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "5000:5000"
+    networks:
+      - libnet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
+
+  frontend:
+    restart: on-failure
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - libnet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
+
+volumes:
+  db_data:
+
+networks:
+  libnet:
