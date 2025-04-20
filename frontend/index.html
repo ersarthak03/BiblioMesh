@@ -3,43 +3,777 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Library System</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>Book Catalogue</title>
+<!-- ✅ Correct way to load Lucide icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #6366f1;
+      --secondary: #f59e0b;
+      --light-bg: #f5f3ff;
+      --text-dark: #1e293b;
+      --text-light: #64748b;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--light-bg);
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+    
+    .min-h-screen {
+      min-height: 100vh;
+    }
+    
+    .bg-gradient-to-b {
+      background: linear-gradient(to bottom, var(--light-bg), white);
+    }
+    
+    /* Header */
+    header {
+      background: linear-gradient(to right, var(--primary), var(--primary-light));
+      padding: 1rem;
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .logo h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    
+    .home-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 9999px;
+      color: white;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+    
+    .home-btn:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Main Content */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+    
+    .page-header {
+      margin-bottom: 2rem;
+    }
+    
+    .page-header h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .page-header p {
+      margin-top: 0.5rem;
+      color: var(--secondary);
+    }
+    
+    /* Controls */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    @media (min-width: 640px) {
+      .controls {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+    
+    .search-container {
+      position: relative;
+      width: 100%;
+      max-width: 24rem;
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 0.5rem 0.75rem 0.5rem 2rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 9999px;
+      background-color: white;
+      outline: none;
+    }
+    
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    }
+    
+    .add-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.5rem;
+      background-color: #c7d2fe;
+      color: var(--text-dark);
+      border: none;
+      border-radius: 9999px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .add-btn:hover {
+      background-color: #a5b4fc;
+    }
+    
+    /* Books Grid */
+    .books-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    @media (min-width: 768px) {
+      .books-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .books-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    .book-card {
+      background-color: white;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s;
+    }
+    
+    .book-card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .book-image {
+      height: 12rem;
+      overflow: hidden;
+      background-color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .book-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    
+    .book-card:hover .book-image img {
+      transform: scale(1.05);
+    }
+    
+    .book-content {
+      padding: 1.5rem;
+    }
+    
+    .book-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    
+    .book-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .book-id {
+      font-size: 0.875rem;
+      color: var(--text-light);
+    }
+    
+    .book-price {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .book-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1rem;
+    }
+    
+    .book-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .action-btn {
+      padding: 0.25rem 0.75rem;
+      border: 1px solid;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .edit-btn {
+      border-color: #c7d2fe;
+      color: var(--primary);
+    }
+    
+    .edit-btn:hover {
+      background-color: #eef2ff;
+    }
+    
+    .delete-btn {
+      border-color: #fecaca;
+      color: #dc2626;
+    }
+    
+    .delete-btn:hover {
+      background-color: #fef2f2;
+    }
+    
+    /* Loading State */
+    .loading {
+      height: 16rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .loading-icon {
+      animation: spin 1s linear infinite;
+      color: var(--primary);
+    }
+    
+    .loading-text {
+      margin-left: 0.5rem;
+      color: var(--primary);
+    }
+    
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    /* Empty State */
+    .empty {
+      grid-column: 1 / -1;
+      height: 6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+    }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      color: white;
+      display: none;
+    }
+    
+    .toast-success {
+      background-color: #10b981;
+    }
+    
+    .toast-error {
+      background-color: #ef4444;
+    }
+    
+    /* Form Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-light);
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 0.375rem;
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      cursor: pointer;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+    }
+    
+    .btn-secondary {
+      background-color: #e2e8f0;
+      color: var(--text-dark);
+      border: none;
+    }
+    
+    /* Footer */
+    footer {
+      background-color: var(--primary);
+      padding: 1rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.8);
+    }
+  </style>
 </head>
-<body>
-  <header class="header">
-    <div class="container">
-      <h1>Welcome to My Library</h1>
-      <p>Manage your book collection with ease</p>
+<body class="min-h-screen bg-gradient-to-b">
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <i data-lucide="book"></i>
+        <h1>Book Catalogue</h1>
+      </div>
+      <a href="/" class="home-btn">
+        <i data-lucide="home"></i>
+        Back to Home
+      </a>
     </div>
   </header>
 
-  <main class="main-content">
-    <div class="container">
-      <section class="intro">
-        <h2>About Our Library</h2>
-        <p>Our digital library system helps you manage your book collection efficiently. You can add, update, and remove books from your catalog.</p>
-      </section>
-
-      <section class="features">
-        <div class="feature-card">
-          <h3>Book Management</h3>
-          <p>Full CRUD operations for your book collection</p>
-          <a href="services.html" class="btn">Go to Services</a>
-        </div>
-        <div class="feature-card">
-          <h3>Search Functionality</h3>
-          <p>Quickly find any book in your collection</p>
-          <a href="services.html" class="btn">Search Books</a>
-        </div>
-      </section>
+  <!-- Main Content -->
+  <main class="container">
+    <div class="page-header">
+      <h1>Book Management</h1>
+      <p>View and manage your book collection</p>
     </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="search-container">
+        <i data-lucide="search" class="search-icon"></i>
+        <input 
+          type="search" 
+          placeholder="Search books..." 
+          class="search-input" 
+          id="searchInput"
+        >
+      </div>
+      <button class="add-btn" id="addBookBtn">
+        <i data-lucide="plus"></i>
+        Add New Book
+      </button>
+    </div>
+
+    <!-- Books Grid -->
+    <div class="books-grid" id="booksGrid">
+      <div class="loading">
+        <i data-lucide="loader-2" class="loading-icon"></i>
+        <span class="loading-text">Loading books...</span>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast toast-success" id="toast"></div>
   </main>
 
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2023 My Library System. All rights reserved.</p>
+  <!-- Add/Edit Book Modal -->
+  <div class="modal" id="bookModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Add New Book</h2>
+        <button class="close-btn" id="closeModal">&times;</button>
+      </div>
+      <form id="bookForm">
+        <input type="hidden" id="bookId">
+        <div class="form-group">
+          <label for="title" class="form-label">Title</label>
+          <input type="text" id="title" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label for="author" class="form-label">Author</label>
+          <input type="text" id="author" class="form-input">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
     </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2023 Book Catalogue. All rights reserved.</p>
   </footer>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    lucide.createIcons();
+  
+    const API_URL = "http://localhost:5000";
+    const booksGrid = document.getElementById('booksGrid');
+    const searchInput = document.getElementById('searchInput');
+    const addBookBtn = document.getElementById('addBookBtn');
+    const toast = document.getElementById('toast');
+    const bookModal = document.getElementById('bookModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const bookForm = document.getElementById('bookForm');
+    const bookIdInput = document.getElementById('bookId');
+    const titleInput = document.getElementById('title');
+    const authorInput = document.getElementById('author');
+    const closeModal = document.getElementById('closeModal');
+    const cancelBtn = document.getElementById('cancelBtn');
+  
+    let books = [];
+    let currentAction = 'add';
+  
+    // Show toast message
+    function showToast(message, type = 'success') {
+      toast.textContent = message;
+      toast.className = `toast toast-${type}`;
+      toast.style.display = 'block';
+  
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+  
+    // Cache handling
+    const cache = {
+      get: (key) => {
+        const item = localStorage.getItem(`cache_${key}`);
+        return item ? JSON.parse(item) : null;
+      },
+      set: (key, value, ttl = 30000) => {
+        const now = new Date();
+        localStorage.setItem(`cache_${key}`, JSON.stringify({
+          value,
+          expiry: now.getTime() + ttl
+        }));
+      },
+      remove: (key) => {
+        localStorage.removeItem(`cache_${key}`);
+      }
+    };
+  
+    // Clear the cache when the page is refreshed
+    function clearCacheOnRefresh() {
+      // Optionally remove cache only on refresh
+      window.addEventListener('beforeunload', () => {
+        cache.remove('all_books');
+      });
+    }
+  
+    // Fetch books from API or cache
+    async function fetchBooks(forceRefresh = false) {
+      const cacheKey = 'all_books';
+  
+      // If we force refresh, clear the cache and fetch fresh data
+      if (forceRefresh) {
+        cache.remove(cacheKey);
+      }
+  
+      // Check for cached data if not forced to refresh
+      if (!forceRefresh) {
+        const cached = cache.get(cacheKey);
+        if (cached) {
+          displayBooks(cached); // Use cached data
+          return;
+        }
+      }
+  
+      try {
+        // Fetch the books from the API
+        const response = await fetch(`${API_URL}/books`);
+  
+        // Check if the response is ok (status 200-299)
+        if (!response.ok) {
+          throw new Error('Failed to fetch books');
+        }
+  
+        // Parse the response as JSON
+        const books = await response.json();
+  
+        // Log the data to inspect the structure
+        console.log('Fetched books:', books);
+  
+        // If the API returns a non-array object, handle it
+        const booksArray = Array.isArray(books) ? books : books.data || [];
+  
+        // Check if it's an array before proceeding
+        if (!Array.isArray(booksArray)) {
+          throw new Error('Books data is not in an array format');
+        }
+  
+        // Cache the data and display books
+        cache.set(cacheKey, booksArray);
+        displayBooks(booksArray);
+      } catch (error) {
+        // Handle errors and show a fallback UI
+        console.error('Error fetching books:', error);
+        displayBooks([]);  // Display an empty grid or error message
+      }
+    }
+  
+    // Display books in grid
+    function displayBooks(booksToDisplay) {
+      if (booksToDisplay.length === 0) {
+        booksGrid.innerHTML = `
+          <div class="empty">
+            No books found.
+          </div>
+        `;
+        return;
+      }
+  
+      booksGrid.innerHTML = booksToDisplay.map(book => `
+        <div class="book-card" data-id="${book[0]}">
+          <div class="book-image">
+            <img src="https://source.unsplash.com/random/300x200/?book,${book[1].replace(/\s+/g, ',')}" alt="${book[1]}">
+          </div>
+          <div class="book-content">
+            <div class="book-header">
+              <div>
+                <h3 class="book-title">${book[1]}</h3>
+                <span class="book-id">ID: ${book[0]}</span>
+              </div>
+            </div>
+            <div class="book-footer">
+              <div class="book-actions">
+                <button class="action-btn edit-btn" onclick="openEditModal(${book[0]})">
+                  Edit
+                </button>
+                <button class="action-btn delete-btn" onclick="deleteBook(${book[0]})">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  
+    // Open modal for adding new book
+    function openAddModal() {
+      currentAction = 'add';
+      modalTitle.textContent = 'Add New Book';
+      bookForm.reset();
+      bookModal.style.display = 'flex';
+    }
+  
+    // Open modal for editing book
+    function openEditModal(id) {
+      const book = books.find(b => b[0] === id);
+      if (!book) return;
+  
+      currentAction = 'edit';
+      modalTitle.textContent = 'Edit Book';
+      bookIdInput.value = book[0];
+      titleInput.value = book[1];
+      bookModal.style.display = 'flex';
+    }
+  
+    // Close modal
+    function closeBookModal() {
+      bookModal.style.display = 'none';
+    }
+  
+    // Handle form submission
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+  
+      const bookData = {
+        name: titleInput.value.trim()
+      };
+  
+      try {
+        let response;
+        if (currentAction === 'add') {
+          response = await fetch(`${API_URL}/books`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bookData)
+          });
+        } else {
+          response = await fetch(`${API_URL}/books/${bookIdInput.value}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bookData)
+          });
+        }
+  
+        if (!response.ok) throw new Error('Failed to save book');
+  
+        closeBookModal();
+        fetchBooks(true);  // Force refresh and clear cache
+        showToast(`Book ${currentAction === 'add' ? 'added' : 'updated'} successfully`);
+      } catch (error) {
+        console.error('Error saving book:', error);
+        showToast('Failed to save book', 'error');
+      }
+    }
+  
+    // Delete book
+    async function deleteBook(bookId) {
+      if (!confirm('Are you sure you want to delete this book?')) {
+        return;
+      }
+  
+      try {
+        const response = await fetch(`${API_URL}/books/${bookId}`, {
+          method: 'DELETE',
+        });
+  
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to delete book');
+        }
+  
+        const result = await response.json();
+        showToast(result.message);
+        fetchBooks(true);  // Force refresh and clear cache
+      } catch (error) {
+        console.error('Error deleting book:', error);
+        showToast(`Error: ${error.message}`, 'error');
+      }
+    }
+  
+    // Search books
+    function searchBooks(query) {
+      const filtered = books.filter(book =>
+        book[1].toLowerCase().includes(query.toLowerCase())
+      );
+      displayBooks(filtered);
+    }
+  
+    // Event listeners
+    addBookBtn.addEventListener('click', openAddModal);
+    closeModal.addEventListener('click', closeBookModal);
+    cancelBtn.addEventListener('click', closeBookModal);
+    bookForm.addEventListener('submit', handleFormSubmit);
+    searchInput.addEventListener('input', (e) => {
+      searchBooks(e.target.value);
+    });
+  
+    // Initialize
+    clearCacheOnRefresh();  // Clear cache on refresh
+    fetchBooks();  // Initial fetch without cache
+  </script>
+  
+  
 </body>
 </html>
