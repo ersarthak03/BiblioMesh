@@ -30,7 +30,7 @@ docker-compose up --build
 
 ```mermaid
 graph LR
-    F[Frontend] -->|HTTP Request| B[Flask API]
+    F[Frontend] -->|HTTP Request| B[PYTHIN API BACKEND]
     B -->|SQL Query| P[(PostgreSQL)]
     B -->|Cache Get/Set| R[(Redis)]
     B -->|Publish Event| M{RabbitMQ}
